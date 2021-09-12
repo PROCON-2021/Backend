@@ -13,7 +13,7 @@ pip install -r requirements.txt
 ```
 
 ## 実行方法
-作成したvenv環境をactivate
+作成したvenv環境をactivateした後，main.pyを実行
 ```
 cd [PATH]
 .Scripts\activate

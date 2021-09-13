@@ -1,8 +1,9 @@
-#import serial
+import serial
 import re
 from multiprocessing import Array, Value
 
 #demo
+"""
 def run(flag: Value, ch1: Array, ch2: Array, ch3: Array):
     array = [""] * 4000
     while flag.value != -1:
@@ -27,9 +28,9 @@ def run(flag: Value, ch1: Array, ch2: Array, ch3: Array):
 
 """
 #serial
-def run(flag, ch1, ch2, ch3):
+def run(flag: Value, ch1: Array, ch2: Array, ch3: Array):
     ser = serial.Serial("COM3", 38400, timeout = 1)
-    array = [""] * 4000
+    array = ["500,500,500,500"] * 4000
     while flag.value != -1:
         i = 0
         while flag.value == 0:
@@ -49,7 +50,7 @@ def run(flag, ch1, ch2, ch3):
                 ch2[j] = int(buf[1])
                 ch3[j] = int(buf[2])
                 i += 1
+            flag.value = 0
 
     ser.close()
     flag.value = 0
-"""

@@ -5,7 +5,7 @@ use('Agg')
 def graph_bin(count: int, arr1: list, arr2: list, arr3: list):
     x = [i * 16 / count for i in range(0, count)]
     graph1, graph2, graph3 = [], [], []
-    pyplot.figure(figsize = (16.0, 2.5), dpi = 96)
+    pyplot.figure(figsize = (16.0, 2.0), dpi = 96)
 
     pyplot.clf()
     pyplot.plot(x, arr1, color = "purple")

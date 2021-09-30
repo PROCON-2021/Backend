@@ -6,6 +6,8 @@ from flask_cors import CORS
 from multiprocessing import Array, Value, Process
 from graph import graph_bin
 from arduino import run
+import numpy as np
+from dnn_estimate import dnn_estimate
 
 flag = Value('i', 0)
 ch1 = Array('i', 3500)
@@ -45,7 +47,7 @@ def save(mode):
 
         arr1, arr2, arr3 = [], [], []
         #腹筋のみ-300する
-        if mode == 1:
+        if mode == '1':
             arr1 = ch1[300:3499]
             arr2 = ch2[300:3499]
             arr3 = ch3[300:3499]
@@ -54,9 +56,10 @@ def save(mode):
             arr2 = ch2[0:3499]
             arr3 = ch3[0:3499]
         
+        sig = np.stack([arr1, arr2, arr3], axis=1)
+
         #DNN
-        score = 22
-        cl = 2
+        cl, score = dnn_estimate(sig, mode)
 
         time = datetime.now()
         path = "../csv/" + time.strftime("%Y%m%d%H%M%S") + ".csv"

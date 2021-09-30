@@ -6,7 +6,6 @@ from flask_cors import CORS
 from multiprocessing import Array, Value, Process
 from graph import graph_bin
 from arduino import run
-from matplotlib.pyplot import inferno
 import numpy as np
 from dnn_estimate import dnn_estimate
 
@@ -38,7 +37,7 @@ def history(key):
 
     graph = graph_bin(len(arr1), arr1, arr2, arr3)
     info = [ \
-        ["things_cant_keep", "things_cant_raise", "things_cant_slow", "things_cant_stop", "things_cant_stop", "things_correct"], \
+        ["things_cant_keep", "things_cant_raise", "things_cant_slow", "things_cant_stop", "things_cant_strech", "things_correct"], \
         ["abs_correct", "abs_keep_shoulders", "abs_raise", "abs_recoil"], \
         ["shoulders_correct", "shoulders_pull", "shoulders_sides", "shoulders_trunk"] \
       ][mode][cl]

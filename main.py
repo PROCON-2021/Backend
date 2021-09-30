@@ -29,14 +29,14 @@ def history(key):
     arr1, arr2, arr3 = [], [], []
     with open(path, mode='r') as f:
         lines = iter(f.readlines())
-        score, cl = map(int, next(lines).split(','))
+        mode, score, cl = map(int, next(lines).split(','))
         date = next(lines).strip()
         arr1 = list(map(int, next(lines).split(',')))
         arr2 = list(map(int, next(lines).split(',')))
         arr3 = list(map(int, next(lines).split(',')))
 
     graph = graph_bin(len(arr1), arr1, arr2, arr3)
-    return jsonify({"count": len(files), "score": score, "class": cl, "date": date, "ch1": graph[0], "ch2": graph[1], "ch3": graph[2]})
+    return jsonify({"count": len(files), "score": score, "mode": mode, "class": cl, "date": date, "ch1": graph[0], "ch2": graph[1], "ch3": graph[2]})
 
 @app.route("/save/<mode>", methods = ["GET"])
 def save(mode):
@@ -64,6 +64,8 @@ def save(mode):
         time = datetime.now()
         path = "../csv/" + time.strftime("%Y%m%d%H%M%S") + ".csv"
         with open(path, mode='w') as f:
+            f.write(mode)
+            f.write(',')
             f.write(str(score))
             f.write(',')
             f.write(str(cl))

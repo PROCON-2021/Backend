@@ -37,7 +37,7 @@ def dnn_estimate(sig, mode):
     if mode == str(0):
         out_dim = 4
         model_src = './model/shoulders.pth'
-    if mode == str(1):
+    elif mode == str(1):
         out_dim = 4
         model_src = './model/abs.pth'
     elif mode == str(2):

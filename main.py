@@ -6,6 +6,7 @@ from flask_cors import CORS
 from multiprocessing import Array, Value, Process
 from graph import graph_bin
 from arduino import run
+from matplotlib.pyplot import inferno
 import numpy as np
 from dnn_estimate import dnn_estimate
 
@@ -29,17 +30,23 @@ def history(key):
     arr1, arr2, arr3 = [], [], []
     with open(path, mode='r') as f:
         lines = iter(f.readlines())
-        mode, score, cl = map(int, next(lines).split(','))
+        score, mode, cl = map(int, next(lines).split(','))
         date = next(lines).strip()
         arr1 = list(map(int, next(lines).split(',')))
         arr2 = list(map(int, next(lines).split(',')))
         arr3 = list(map(int, next(lines).split(',')))
 
     graph = graph_bin(len(arr1), arr1, arr2, arr3)
-    return jsonify({"count": len(files), "score": score, "mode": mode, "class": cl, "date": date, "ch1": graph[0], "ch2": graph[1], "ch3": graph[2]})
+    info = [ \
+        ["things_cant_keep", "things_cant_raise", "things_cant_slow", "things_cant_stop", "things_cant_stop", "things_correct"], \
+        ["abs_correct", "abs_keep_shoulders", "abs_raise", "abs_recoil"], \
+        ["shoulders_correct", "shoulders_pull", "shoulders_sides", "shoulders_trunk"] \
+      ][mode][cl]
 
-@app.route("/save/<mode>", methods = ["GET"])
-def save(mode):
+    return jsonify({"count": len(files), "score": score, "info": info, "date": date, "ch1": graph[0], "ch2": graph[1], "ch3": graph[2]})
+
+@app.route("/save/<m>", methods = ["GET"])
+def save(m):
     if proc.is_alive():
         flag.value = 1
         while flag.value != 0:
@@ -47,7 +54,7 @@ def save(mode):
 
         arr1, arr2, arr3 = [], [], []
         #腹筋のみ-300する
-        if mode == '1':
+        if m == '1':
             arr1 = ch1[300:3499]
             arr2 = ch2[300:3499]
             arr3 = ch3[300:3499]
@@ -59,15 +66,15 @@ def save(mode):
         sig = np.stack([arr1, arr2, arr3], axis=1)
 
         #DNN
-        cl, score = dnn_estimate(sig, mode)
+        cl, score = dnn_estimate(sig, m)
 
         time = datetime.now()
         path = "../csv/" + time.strftime("%Y%m%d%H%M%S") + ".csv"
         with open(path, mode='w') as f:
-            f.write(mode)
-            f.write(',')
             f.write(str(score))
-            f.write(',')
+            f.write(", ")
+            f.write(m)
+            f.write(", ")
             f.write(str(cl))
             f.write('\n')
             f.write(time.strftime("%Y/%m/%d %H:%M:%S"))

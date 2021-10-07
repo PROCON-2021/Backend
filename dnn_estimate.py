@@ -21,7 +21,7 @@ def dnn_estimate(sig, mode):
     # 種目ごとに分類数が異なるので
     if mode == str(0):
         out_dim = 4
-        model_src = './model/shoulders.pth'
+        model_src = './model/shoulders/shoulders.pth'
         condition_path = './model/shoulders/config.yaml'
     elif mode == str(1):
         out_dim = 4
@@ -37,15 +37,16 @@ def dnn_estimate(sig, mode):
     fft_size = yml['fft_size']['value']
 
     # DNNモデル定義
-    model = Conv2dModel(fft_size, out_dim, mode='thighs').to(device)
+    if mode == str(1) or mode == str(2):
+        model = Conv2dModel(fft_size, out_dim, mode='thighs').to(device)
+    elif mode == str(0):
+        model = models.resnet152(pretrained=False)
+        num_ftrs = model.fc.in_features
+        model.fc = nn.Linear(num_ftrs, out_dim)
 
-    # model = models.resnet152(pretrained=False)
-    # num_ftrs = model.fc.in_features
-    # model.fc = nn.Linear(num_ftrs, out_dim)
-
-    # model.fc = nn.Sequential(nn.Dropout(p=0), model.fc)
-    # model.layer4[1] = nn.Sequential(nn.Dropout(p=0), model.layer4[1])
-    # model.layer4[2] = nn.Sequential(nn.Dropout(p=0), model.layer4[2])
+        model.fc = nn.Sequential(nn.Dropout(p=0), model.fc)
+        model.layer4[1] = nn.Sequential(nn.Dropout(p=0), model.layer4[1])
+        model.layer4[2] = nn.Sequential(nn.Dropout(p=0), model.layer4[2])
 
     # 保存されたモデルを読み込み
     model.load_state_dict(t.load(model_src, map_location=device))
@@ -62,8 +63,14 @@ def dnn_estimate(sig, mode):
 
     softmax = nn.Softmax(dim=1)
     scores = softmax(pred)
-    score = scores[0,0]
 
+    # 腕と腹筋
+    if mode == str(0) or mode == str(1):
+        score = scores[0,0]
+    # ももあげ
+    elif mode == str(2):
+        score = scores[0,-1]
+    
     score = score.cpu().detach().numpy().item()
     category = category.cpu().detach().numpy().item()
 

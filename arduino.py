@@ -43,7 +43,7 @@ def run(flag: Value, ch1: Array, ch2: Array, ch3: Array):
                     i -= 4000
         
         if flag.value == 1:
-            i += 500
+            i += 600
             for j in range(0, 3500):
                 buf = array[i % 4000].split(',')
                 ch1[j] = int(buf[0])
